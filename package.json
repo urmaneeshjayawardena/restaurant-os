@@ -1,0 +1,14 @@
+{
+  "name": "restaurant-os",
+  "version": "0.1.0",
+  "description": "Menu, table and order management for small restaurants",
+  "type": "module",
+  "private": true,
+  "engines": {
+    "node": ">=22"
+  },
+  "scripts": {
+    "test": "node --test"
+  },
+  "license": "MIT"
+}
