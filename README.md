@@ -1,10 +1,22 @@
 # restaurant-os
 
-Menu, table and order management for small restaurants. The goal is something
-a family-run place could actually use: take orders at the table, send them to
-the kitchen, and print a correct bill.
+QR code table ordering for small restaurants.
 
-Early days. Right now it's the core order and billing logic, with an API and
+## The problem
+
+At a busy restaurant, guests wait for a menu, wait to order, and wait again for
+the bill. Orders get written down wrong, and most QR ordering services charge
+more per month than a small family-run place wants to pay.
+
+## The idea
+
+Each table gets a QR code. A guest scans it, browses the menu on their phone
+and places the order, with no app to install. The order shows up on a kitchen
+screen straight away, and the bill is ready when the table asks for it.
+
+## Status
+
+Early days. Right now it's the core order and billing logic, with the API and
 screens coming next. See [BACKLOG.md](BACKLOG.md) for what's planned.
 
 ## Running the tests
