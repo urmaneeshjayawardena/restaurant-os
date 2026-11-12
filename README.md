@@ -32,3 +32,7 @@ npm test
 All prices are stored as whole cents so totals never pick up floating point
 errors. Service charge is worked out on the subtotal, and tax on the subtotal
 plus service charge.
+
+## License
+
+MIT, see [LICENSE](LICENSE).
