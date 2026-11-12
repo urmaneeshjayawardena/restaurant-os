@@ -1,6 +1,12 @@
 import assert from 'node:assert/strict';
 import { test } from 'node:test';
-import { addItem, calculateBill, createOrder, removeItem } from '../src/order.js';
+import {
+  addItem,
+  advanceStatus,
+  calculateBill,
+  createOrder,
+  removeItem,
+} from '../src/order.js';
 
 const rice = { id: 'rice', name: 'Fried rice', priceCents: 95000 };
 const tea = { id: 'tea', name: 'Tea', priceCents: 15000 };
@@ -51,4 +57,32 @@ test('bill applies service charge, then tax on top of it', () => {
 
 test('an empty order costs nothing', () => {
   assert.equal(calculateBill(createOrder(1)).totalCents, 0);
+});
+
+test('a new order starts as placed', () => {
+  assert.equal(createOrder(3).status, 'placed');
+});
+
+test('status moves forward one step at a time until paid', () => {
+  let order = addItem(createOrder(3), tea);
+  const seen = [order.status];
+
+  while (order.status !== 'paid') {
+    order = advanceStatus(order);
+    seen.push(order.status);
+  }
+
+  assert.deepEqual(seen, ['placed', 'preparing', 'ready', 'served', 'paid']);
+  assert.throws(() => advanceStatus(order), /already paid/);
+});
+
+test('an empty order cannot go to the kitchen', () => {
+  assert.throws(() => advanceStatus(createOrder(3)), /empty order/);
+});
+
+test('items are locked once the kitchen starts', () => {
+  const order = advanceStatus(addItem(createOrder(3), tea));
+
+  assert.throws(() => addItem(order, rice), /preparing/);
+  assert.throws(() => removeItem(order, 'tea'), /preparing/);
 });
