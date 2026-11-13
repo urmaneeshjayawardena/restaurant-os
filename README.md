@@ -16,7 +16,7 @@ screen straight away, and the bill is ready when the table asks for it.
 
 ## Status
 
-Early days. Right now it's the core order and billing logic, with the API and
+Early days. Right now it's the core table, order and billing logic, with the API and
 screens coming next. See [BACKLOG.md](BACKLOG.md) for what's planned.
 
 ## Running the tests
@@ -26,6 +26,12 @@ Needs Node 22 or newer.
 ```
 npm test
 ```
+
+## Table tokens
+
+Each table has a random 128-bit token that goes in its QR code link, so guests
+can't order for another table by changing a number in the URL. Rotating a
+table's token makes its old QR code stop working.
 
 ## Money
 
