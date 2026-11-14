@@ -7,7 +7,7 @@ Worked through roughly top to bottom, one item at a time.
 - [x] Orders with line items and bill totals
 - [x] Order status flow (placed, preparing, ready, served, paid)
 - [x] Table model with an unguessable QR token per table
-- [ ] Item notes ("no onions") that stay on separate order lines
+- [x] Item notes ("no onions") that stay on separate order lines
 - [ ] Mark items as sold out and block ordering them
 - [ ] Combine several orders from one table into one bill
 - [ ] Split a bill evenly between guests
