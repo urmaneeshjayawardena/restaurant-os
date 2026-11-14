@@ -33,6 +33,13 @@ Each table has a random 128-bit token that goes in its QR code link, so guests
 can't order for another table by changing a number in the URL. Rotating a
 table's token makes its old QR code stop working.
 
+## Item notes
+
+Guests can add a short note to an item, such as "no onions". The same dish
+with a different note goes on its own order line so the kitchen sees each
+request separately. Notes are trimmed, capped at 140 characters and don't
+change the price.
+
 ## Money
 
 All prices are stored as whole cents so totals never pick up floating point

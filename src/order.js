@@ -1,4 +1,5 @@
 export const ORDER_STATUSES = ['placed', 'preparing', 'ready', 'served', 'paid'];
+export const MAX_NOTE_LENGTH = 140;
 
 export function createOrder(tableNumber) {
   if (!Number.isInteger(tableNumber) || tableNumber < 1) {
@@ -21,11 +22,16 @@ export function advanceStatus(order) {
   return { ...order, status: next };
 }
 
-export function addItem(order, menuItem, quantity = 1) {
+// Lines are matched on item and note together, so "no onions" stays on its
+// own line instead of merging into the plain version of the same dish.
+export function addItem(order, menuItem, quantity = 1, { note = '' } = {}) {
   assertEditable(order);
   assertQuantity(quantity);
+  const cleanNote = normalizeNote(note);
 
-  const existing = order.lines.find((line) => line.itemId === menuItem.id);
+  const existing = order.lines.find(
+    (line) => line.itemId === menuItem.id && line.note === cleanNote,
+  );
   if (existing) {
     return {
       ...order,
@@ -41,14 +47,20 @@ export function addItem(order, menuItem, quantity = 1) {
     name: menuItem.name,
     unitPriceCents: menuItem.priceCents,
     quantity,
+    note: cleanNote,
   };
 
   return { ...order, lines: [...order.lines, line] };
 }
 
-export function removeItem(order, itemId) {
+// Without a note this drops every line for the item; with one, only that line.
+export function removeItem(order, itemId, { note } = {}) {
   assertEditable(order);
-  return { ...order, lines: order.lines.filter((line) => line.itemId !== itemId) };
+  const cleanNote = note === undefined ? undefined : normalizeNote(note);
+  const matches = (line) =>
+    line.itemId === itemId && (cleanNote === undefined || line.note === cleanNote);
+
+  return { ...order, lines: order.lines.filter((line) => !matches(line)) };
 }
 
 export function calculateBill(order, { serviceRate = 0, taxRate = 0 } = {}) {
@@ -78,4 +90,15 @@ function assertQuantity(quantity) {
   if (!Number.isInteger(quantity) || quantity < 1) {
     throw new Error(`invalid quantity: ${quantity}`);
   }
+}
+
+// Guests type notes on a phone, so stray spaces shouldn't split identical requests.
+function normalizeNote(note) {
+  if (typeof note !== 'string') throw new Error(`invalid note: ${note}`);
+
+  const clean = note.trim().replace(/\s+/g, ' ');
+  if (clean.length > MAX_NOTE_LENGTH) {
+    throw new Error(`note is longer than ${MAX_NOTE_LENGTH} characters`);
+  }
+  return clean;
 }
