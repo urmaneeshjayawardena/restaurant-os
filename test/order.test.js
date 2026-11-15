@@ -5,6 +5,7 @@ import {
   advanceStatus,
   calculateBill,
   createOrder,
+  MAX_NOTE_LENGTH,
   removeItem,
 } from '../src/order.js';
 
@@ -85,4 +86,39 @@ test('items are locked once the kitchen starts', () => {
 
   assert.throws(() => addItem(order, rice), /preparing/);
   assert.throws(() => removeItem(order, 'tea'), /preparing/);
+});
+
+test('the same dish with a different note gets its own line', () => {
+  let order = addItem(createOrder(5), rice);
+  order = addItem(order, rice, 1, { note: 'no onions' });
+  order = addItem(order, rice, 2, { note: '  no   onions ' });
+
+  assert.deepEqual(
+    order.lines.map(({ note, quantity }) => ({ note, quantity })),
+    [
+      { note: '', quantity: 1 },
+      { note: 'no onions', quantity: 3 },
+    ],
+  );
+});
+
+test('notes do not change the bill', () => {
+  const order = addItem(addItem(createOrder(5), tea), tea, 1, { note: 'no sugar' });
+  assert.equal(calculateBill(order).subtotalCents, 30000);
+});
+
+test('removing with a note drops only that line', () => {
+  let order = addItem(createOrder(5), rice);
+  order = addItem(order, rice, 1, { note: 'extra spicy' });
+
+  const withoutSpicy = removeItem(order, 'rice', { note: 'extra spicy' });
+  assert.deepEqual(withoutSpicy.lines.map((line) => line.note), ['']);
+  assert.equal(removeItem(order, 'rice').lines.length, 0);
+});
+
+test('rejects notes that are too long or not text', () => {
+  const tooLong = 'x'.repeat(MAX_NOTE_LENGTH + 1);
+
+  assert.throws(() => addItem(createOrder(1), tea, 1, { note: tooLong }), /longer than/);
+  assert.throws(() => addItem(createOrder(1), tea, 1, { note: 42 }), /invalid note/);
 });
