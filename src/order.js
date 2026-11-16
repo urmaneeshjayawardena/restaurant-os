@@ -26,6 +26,7 @@ export function advanceStatus(order) {
 // own line instead of merging into the plain version of the same dish.
 export function addItem(order, menuItem, quantity = 1, { note = '' } = {}) {
   assertEditable(order);
+  assertOrderable(menuItem);
   assertQuantity(quantity);
   const cleanNote = normalizeNote(note);
 
@@ -84,6 +85,11 @@ function assertEditable(order) {
   if (order.status !== 'placed') {
     throw new Error(`cannot change an order that is ${order.status}`);
   }
+}
+
+// Only blocks new orders; lines already placed for the item are left alone.
+function assertOrderable(menuItem) {
+  if (menuItem.soldOut) throw new Error(`${menuItem.name} is sold out`);
 }
 
 function assertQuantity(quantity) {

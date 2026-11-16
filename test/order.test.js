@@ -122,3 +122,17 @@ test('rejects notes that are too long or not text', () => {
   assert.throws(() => addItem(createOrder(1), tea, 1, { note: tooLong }), /longer than/);
   assert.throws(() => addItem(createOrder(1), tea, 1, { note: 42 }), /invalid note/);
 });
+
+test('sold out items cannot be ordered', () => {
+  const soldOutRice = { ...rice, soldOut: true };
+  assert.throws(() => addItem(createOrder(6), soldOutRice), /Fried rice is sold out/);
+});
+
+test('selling out does not touch lines already ordered', () => {
+  const order = addItem(createOrder(6), rice);
+  const soldOutRice = { ...rice, soldOut: true };
+
+  assert.throws(() => addItem(order, soldOutRice), /sold out/);
+  assert.equal(removeItem(order, 'rice').lines.length, 0);
+  assert.equal(order.lines[0].quantity, 1);
+});

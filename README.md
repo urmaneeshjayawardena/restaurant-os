@@ -40,6 +40,12 @@ with a different note goes on its own order line so the kitchen sees each
 request separately. Notes are trimmed, capped at 140 characters and don't
 change the price.
 
+## Sold out items
+
+Staff can mark a menu item sold out and back again with `markSoldOut` and
+`markAvailable`. Sold out items drop off the guest menu (`availableItems`) and
+can't be added to an order, but lines already ordered stay as they are.
+
 ## Money
 
 All prices are stored as whole cents so totals never pick up floating point
