@@ -9,7 +9,7 @@ Worked through roughly top to bottom, one item at a time.
 - [x] Table model with an unguessable QR token per table
 - [x] Item notes ("no onions") that stay on separate order lines
 - [x] Mark items as sold out and block ordering them
-- [ ] Combine several orders from one table into one bill
+- [x] Combine several orders from one table into one bill
 - [ ] Split a bill evenly between guests
 
 ## Storage

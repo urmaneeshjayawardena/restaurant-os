@@ -80,6 +80,44 @@ export function calculateBill(order, { serviceRate = 0, taxRate = 0 } = {}) {
   };
 }
 
+// A table that orders again mid-meal gets one bill for everything. Service and
+// tax are applied to the combined lines, so rounding happens once, not per order.
+export function combineOrders(orders) {
+  if (orders.length === 0) throw new Error('no orders to combine');
+
+  const { tableNumber } = orders[0];
+  const lines = [];
+
+  for (const order of orders) {
+    if (order.tableNumber !== tableNumber) {
+      throw new Error(`cannot combine orders from tables ${tableNumber} and ${order.tableNumber}`);
+    }
+    if (order.status === 'paid') {
+      throw new Error(`an order for table ${tableNumber} is already paid`);
+    }
+    for (const line of order.lines) mergeLine(lines, line);
+  }
+
+  return { tableNumber, orderCount: orders.length, lines };
+}
+
+// Price is part of the match so a dish ordered before and after a menu price
+// change shows both prices on the bill rather than silently picking one.
+function mergeLine(lines, line) {
+  const index = lines.findIndex(
+    (existing) =>
+      existing.itemId === line.itemId &&
+      existing.note === line.note &&
+      existing.unitPriceCents === line.unitPriceCents,
+  );
+
+  if (index === -1) {
+    lines.push({ ...line });
+  } else {
+    lines[index] = { ...lines[index], quantity: lines[index].quantity + line.quantity };
+  }
+}
+
 // Once the kitchen has started cooking, changes need a new order instead.
 function assertEditable(order) {
   if (order.status !== 'placed') {
