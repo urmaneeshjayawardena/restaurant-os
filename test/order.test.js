@@ -4,6 +4,7 @@ import {
   addItem,
   advanceStatus,
   calculateBill,
+  combineOrders,
   createOrder,
   MAX_NOTE_LENGTH,
   removeItem,
@@ -135,4 +136,59 @@ test('selling out does not touch lines already ordered', () => {
   assert.throws(() => addItem(order, soldOutRice), /sold out/);
   assert.equal(removeItem(order, 'rice').lines.length, 0);
   assert.equal(order.lines[0].quantity, 1);
+});
+
+test('orders from one table combine into a single bill', () => {
+  const first = advanceStatus(addItem(addItem(createOrder(8), rice), tea));
+  const second = addItem(addItem(createOrder(8), tea, 2), tea, 1, { note: 'no sugar' });
+
+  const combined = combineOrders([first, second]);
+
+  assert.equal(combined.tableNumber, 8);
+  assert.equal(combined.orderCount, 2);
+  assert.deepEqual(
+    combined.lines.map(({ itemId, note, quantity }) => ({ itemId, note, quantity })),
+    [
+      { itemId: 'rice', note: '', quantity: 1 },
+      { itemId: 'tea', note: '', quantity: 3 },
+      { itemId: 'tea', note: 'no sugar', quantity: 1 },
+    ],
+  );
+  assert.equal(calculateBill(combined).subtotalCents, 155000);
+});
+
+test('combining leaves the original orders untouched', () => {
+  const first = addItem(createOrder(8), tea);
+  const second = addItem(createOrder(8), tea);
+
+  combineOrders([first, second]);
+  assert.equal(first.lines[0].quantity, 1);
+});
+
+test('the combined bill rounds service and tax once', () => {
+  const cheapTea = { ...tea, priceCents: 5 };
+  const orders = [addItem(createOrder(2), cheapTea), addItem(createOrder(2), cheapTea)];
+
+  const perOrderService = orders
+    .map((order) => calculateBill(order, { serviceRate: 0.1 }).serviceCents)
+    .reduce((sum, cents) => sum + cents, 0);
+
+  assert.equal(perOrderService, 2);
+  assert.equal(calculateBill(combineOrders(orders), { serviceRate: 0.1 }).serviceCents, 1);
+});
+
+test('the same dish at two prices stays on separate lines', () => {
+  const before = addItem(createOrder(4), tea);
+  const after = addItem(createOrder(4), { ...tea, priceCents: 20000 });
+
+  const { lines } = combineOrders([before, after]);
+  assert.deepEqual(lines.map((line) => line.unitPriceCents), [15000, 20000]);
+});
+
+test('refuses to combine across tables, paid orders or nothing', () => {
+  const paid = { ...addItem(createOrder(1), tea), status: 'paid' };
+
+  assert.throws(() => combineOrders([createOrder(1), createOrder(2)]), /tables 1 and 2/);
+  assert.throws(() => combineOrders([createOrder(1), paid]), /already paid/);
+  assert.throws(() => combineOrders([]), /no orders/);
 });

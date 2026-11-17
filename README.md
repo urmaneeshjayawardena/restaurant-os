@@ -46,6 +46,14 @@ Staff can mark a menu item sold out and back again with `markSoldOut` and
 `markAvailable`. Sold out items drop off the guest menu (`availableItems`) and
 can't be added to an order, but lines already ordered stay as they are.
 
+## One bill per table
+
+A table that orders more than once still gets a single bill.
+`combineOrders(orders)` merges the unpaid orders for one table into one set of
+lines, which `calculateBill` then totals as usual, so service charge and tax
+are rounded once on the whole bill. The same dish ordered at two different
+prices stays on separate lines.
+
 ## Money
 
 All prices are stored as whole cents so totals never pick up floating point
