@@ -8,6 +8,7 @@ import {
   createOrder,
   MAX_NOTE_LENGTH,
   removeItem,
+  splitEvenly,
 } from '../src/order.js';
 
 const rice = { id: 'rice', name: 'Fried rice', priceCents: 95000 };
@@ -191,4 +192,33 @@ test('refuses to combine across tables, paid orders or nothing', () => {
   assert.throws(() => combineOrders([createOrder(1), createOrder(2)]), /tables 1 and 2/);
   assert.throws(() => combineOrders([createOrder(1), paid]), /already paid/);
   assert.throws(() => combineOrders([]), /no orders/);
+});
+
+test('a bill that divides evenly gives everyone the same share', () => {
+  assert.deepEqual(splitEvenly(90000, 3), [30000, 30000, 30000]);
+});
+
+test('leftover cents go to the first guests and the shares still add up', () => {
+  const shares = splitEvenly(266090, 3);
+
+  assert.deepEqual(shares, [88697, 88697, 88696]);
+  assert.equal(shares.reduce((sum, share) => sum + share, 0), 266090);
+});
+
+test('splitting a real bill never loses or invents a cent', () => {
+  const order = addItem(addItem(createOrder(7), rice, 2), tea);
+  const { totalCents } = calculateBill(order, { serviceRate: 0.1, taxRate: 0.18 });
+
+  for (let guests = 1; guests <= 12; guests++) {
+    const shares = splitEvenly(totalCents, guests);
+    assert.equal(shares.reduce((sum, share) => sum + share, 0), totalCents);
+    assert.ok(Math.max(...shares) - Math.min(...shares) <= 1);
+  }
+});
+
+test('rejects a bad total or number of guests', () => {
+  assert.throws(() => splitEvenly(1000, 0), /guests/);
+  assert.throws(() => splitEvenly(1000, 2.5), /guests/);
+  assert.throws(() => splitEvenly(-1, 2), /total/);
+  assert.throws(() => splitEvenly(10.5, 2), /total/);
 });

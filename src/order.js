@@ -80,6 +80,22 @@ export function calculateBill(order, { serviceRate = 0, taxRate = 0 } = {}) {
   };
 }
 
+// Shares are whole cents and always add back up to the total. Any leftover
+// cents go one each to the first guests, so no share differs by more than 1.
+export function splitEvenly(totalCents, guests) {
+  if (!Number.isInteger(totalCents) || totalCents < 0) {
+    throw new Error(`invalid total: ${totalCents}`);
+  }
+  if (!Number.isInteger(guests) || guests < 1) {
+    throw new Error(`invalid number of guests: ${guests}`);
+  }
+
+  const base = Math.floor(totalCents / guests);
+  const leftover = totalCents - base * guests;
+
+  return Array.from({ length: guests }, (_, i) => base + (i < leftover ? 1 : 0));
+}
+
 // A table that orders again mid-meal gets one bill for everything. Service and
 // tax are applied to the combined lines, so rounding happens once, not per order.
 export function combineOrders(orders) {

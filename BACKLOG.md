@@ -10,7 +10,7 @@ Worked through roughly top to bottom, one item at a time.
 - [x] Item notes ("no onions") that stay on separate order lines
 - [x] Mark items as sold out and block ordering them
 - [x] Combine several orders from one table into one bill
-- [ ] Split a bill evenly between guests
+- [x] Split a bill evenly between guests
 
 ## Storage
 - [ ] SQLite schema using node:sqlite
