@@ -21,7 +21,8 @@ screens coming next. See [BACKLOG.md](BACKLOG.md) for what's planned.
 
 ## Running the tests
 
-Needs Node 22 or newer.
+Needs Node 22.13 or newer, the first release with `node:sqlite` available
+without a flag.
 
 ```
 npm test
@@ -53,6 +54,15 @@ A table that orders more than once still gets a single bill.
 lines, which `calculateBill` then totals as usual, so service charge and tax
 are rounded once on the whole bill. The same dish ordered at two different
 prices stays on separate lines.
+
+## Storage
+
+`openDatabase(path)` opens a SQLite file with the built-in `node:sqlite`
+module, or an in-memory database when no path is given. It turns on foreign
+keys and brings the schema up to date, tracking the version in
+`PRAGMA user_version` so each upgrade only runs once. Order lines keep their
+own copy of the item name and price, matching the in-memory order logic.
+Node still prints an experimental warning the first time `node:sqlite` loads.
 
 ## Money
 
