@@ -13,7 +13,7 @@ Worked through roughly top to bottom, one item at a time.
 - [x] Split a bill evenly between guests
 
 ## Storage
-- [ ] SQLite schema using node:sqlite
+- [x] SQLite schema using node:sqlite
 - [ ] Menu repository
 - [ ] Table repository
 - [ ] Order repository
