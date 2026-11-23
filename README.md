@@ -64,6 +64,12 @@ keys and brings the schema up to date, tracking the version in
 own copy of the item name and price, matching the in-memory order logic.
 Node still prints an experimental warning the first time `node:sqlite` loads.
 
+`createMenuRepository(db)` saves and reads menu items. `save` validates an item
+the same way as `createMenuItem` and updates it in place if the id already
+exists, `get` reads one item, `setSoldOut` flips the sold out flag, and
+`loadMenu` returns the whole menu as the same map the in-memory menu functions
+use, ordered by category then name.
+
 ## Money
 
 All prices are stored as whole cents so totals never pick up floating point
