@@ -70,6 +70,12 @@ exists, `get` reads one item, `setSoldOut` flips the sold out flag, and
 `loadMenu` returns the whole menu as the same map the in-memory menu functions
 use, ordered by category then name.
 
+`createTableRepository(db)` does the same for tables. `save` validates a table
+like `createTable` and refuses a token another table already uses,
+`findByToken` looks up the table behind a scanned QR code, `list` returns all
+tables by number, and `rotateToken` stores a fresh token so the old QR code
+stops working.
+
 ## Money
 
 All prices are stored as whole cents so totals never pick up floating point
