@@ -16,7 +16,7 @@ Worked through roughly top to bottom, one item at a time.
 - [x] SQLite schema using node:sqlite
 - [x] Menu repository
 - [x] Table repository
-- [x] Order repository
+- [ ] Order repository
 - [ ] Seed script with a sample menu
 
 ## API
