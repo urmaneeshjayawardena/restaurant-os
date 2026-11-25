@@ -76,6 +76,13 @@ like `createTable` and refuses a token another table already uses,
 tables by number, and `rotateToken` stores a fresh token so the old QR code
 stops working.
 
+`createOrderRepository(db)` stores orders with their lines. `save` inserts an
+order without an id and returns it with its new `id` and `createdAt`, or
+updates the status and lines of one that has an id, all in one transaction so
+a failed save leaves nothing half written. `get` reads one order back, and
+`unpaidForTable` returns a table's orders that aren't paid yet, oldest first,
+ready to pass to `combineOrders`.
+
 ## Money
 
 All prices are stored as whole cents so totals never pick up floating point
