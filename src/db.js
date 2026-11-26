@@ -63,6 +63,18 @@ export function schemaVersion(db) {
   return db.prepare('PRAGMA user_version').get().user_version;
 }
 
+export function inTransaction(db, work) {
+  db.exec('BEGIN');
+  try {
+    const result = work();
+    db.exec('COMMIT');
+    return result;
+  } catch (error) {
+    db.exec('ROLLBACK');
+    throw error;
+  }
+}
+
 function migrate(db) {
   const current = schemaVersion(db);
   if (current > SCHEMA_VERSION) {
@@ -70,14 +82,9 @@ function migrate(db) {
   }
 
   for (let version = current; version < SCHEMA_VERSION; version++) {
-    db.exec('BEGIN');
-    try {
+    inTransaction(db, () => {
       db.exec(MIGRATIONS[version]);
       db.exec(`PRAGMA user_version = ${version + 1}`);
-      db.exec('COMMIT');
-    } catch (error) {
-      db.exec('ROLLBACK');
-      throw error;
-    }
+    });
   }
 }

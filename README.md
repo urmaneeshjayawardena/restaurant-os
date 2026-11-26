@@ -83,6 +83,11 @@ a failed save leaves nothing half written. `get` reads one order back, and
 `unpaidForTable` returns a table's orders that aren't paid yet, oldest first,
 ready to pass to `combineOrders`.
 
+To try it with some data, `npm run seed` creates `restaurant.db` (or the file
+you name, as in `npm run seed -- cafe.db`) with a small Sri Lankan sample menu
+and eight tables, each with its own QR token. It only adds what is missing, so
+running it again never changes prices you've edited or reissues table tokens.
+
 ## Money
 
 All prices are stored as whole cents so totals never pick up floating point
