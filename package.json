@@ -8,7 +8,8 @@
     "node": ">=22.13"
   },
   "scripts": {
-    "test": "node --test"
+    "test": "node --test",
+    "seed": "node scripts/seed.js"
   },
   "license": "MIT"
 }

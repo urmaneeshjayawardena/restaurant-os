@@ -1,3 +1,4 @@
+import { inTransaction } from './db.js';
 import { ORDER_STATUSES, createOrder } from './order.js';
 
 export function createOrderRepository(db) {
@@ -80,16 +81,4 @@ function toLine(row) {
     quantity: row.quantity,
     note: row.note,
   };
-}
-
-function inTransaction(db, work) {
-  db.exec('BEGIN');
-  try {
-    const result = work();
-    db.exec('COMMIT');
-    return result;
-  } catch (error) {
-    db.exec('ROLLBACK');
-    throw error;
-  }
 }
